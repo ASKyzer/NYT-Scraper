@@ -105,7 +105,19 @@ app.get("/article/:id", function(req, res) {
   })
 }) // end of GET request to our /article/:id route.
 
-
+// Route to save the article
+app.post("/articles/save/:id", function(req, res) {
+  // Use the article id to find and update the isSaved boolean to true,
+  db.Article.findOneAndUpdate({ _id: req.params.id }, { isSaved: true })
+    .then(function(dbArticle) {
+      // If successful, send it bavk to the client
+      res.json(dbArticle);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    })
+}) // end of POST request to /articles/save/:id route
 
 
 
