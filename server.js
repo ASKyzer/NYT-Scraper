@@ -89,6 +89,22 @@ app.get("/articles", function(req, res) {
   })
 }) //end of GET request to /articles route
 
+// Route for grabbing a specific article by id and poupulate it with it's Note
+app.get("/article/:id", function(req, res) {
+  // Using the id passed in the id parameter, prepare a query to find the matching on in our db.
+  db.Article.findOne({ _id: req.params.id })
+  // now populate all of the notes associated with it
+  .populate("notes")
+  .then(function(dbArticle) {
+    // If sucessful, find the article with the given id and send it bavk to the client
+    res.json(dbArticle);
+  })
+  .catch(function(err) {
+    // If there is an error, send it bavk to the client
+    res.json(err);
+  })
+}) // end of GET request to our /article/:id route.
+
 
 
 
