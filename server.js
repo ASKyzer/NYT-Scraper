@@ -119,7 +119,41 @@ app.post("/articles/save/:id", function(req, res) {
     })
 }) // end of POST request to /articles/save/:id route
 
+// Route to create and update article with it's note.
+app.post("/notes/save/:id", function(req, res) {
+  // Create a new not and pass the req.body to the entry
+  db.Note.create(req.body)
+  .then(function(dbNote) {
+    // If the note was created successfully, find one Article with that id and update it to be associated with the note.
+    return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote.id });
+  })
+  .then(function(dbArticle) {
+    // if successful in updating the article, send it bavk to the client
+    res.json(dbArticle);
+  })
+  .catch(function(err) {
+    // If an error occurred, send it to the client
+    res.json(err);
+  })
+}) // end of POST request to our notes/save/:id route
 
+// Delete a note
+app.delete("/notes/delete/:id", function(req, res) {
+  // Find note by it's id and delete it.
+  db.Note.findOneAndRemove({ _id: req.params.id })
+  .then(function(dbNote) {
+
+    return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote.id });
+  })
+  .then(function(dbArticle) {
+    // if successful in updating the article, send it bavk to the client
+    res.json(dbArticle);
+  })
+  .catch(function(err) {
+    // If an error occurred, send it to the client
+    res.json(err);
+  })
+}) // end of POST request to our notes/save/:id route
 
 // Listen on port
 app.listen(port, function() {
