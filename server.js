@@ -41,6 +41,26 @@ mongoose.connect("mongodb://localhost/scrapingthenews");
 
 // ROUTES //
 
+//GET requests to render Handlebars pages
+app.get("/", function(req, res) {
+  db.Article.find({ isSaved: false}, function(error, data) {
+    var hbsObject = {
+      article: data
+    };
+    console.log(hbsObject);
+    res.render("home", hbsObject);
+  });
+});
+
+app.get("/saved", function(req, res) {
+  db.Article.find({isSaved: true}).populate("notes").exec(function(error, articles) {
+    var hbsObject = {
+      article: articles
+    };
+    res.render("saved", hbsObject);
+  });
+});
+
 // Get request to scrape the NYT website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with request
