@@ -28,7 +28,7 @@ $(".save").click(function() {
 
 
 //Handle Delete Article button
-$(".delete").on("click", function() {
+$(".delete").click(function() {
     var savedArticleId = $(this).attr("data-id");
     $.ajax({
         method: "POST",
@@ -37,6 +37,38 @@ $(".delete").on("click", function() {
         window.location = "/saved"
     })
   }) // end of delete on click function
+
+  // Handle Saving notes for an articles
+  $(".saveNote").click(function() {
+    var savedNoteId = $(this).attr("data-id");
+    $.ajax({
+      url: "/notes/saved/" + savedNoteId,
+      method: "POST",
+      data: {
+        text: $("#noteText" + savedNoteId).val()
+      }
+    }).done(function(data) {
+      console.log(data);
+      // Clear the note textarea
+      $("#noteText" + savedNoteId).val("");
+      $(".modalNote").modal("hide");
+      window.location = "/saved"
+    })
+  })
+
+  //Handle Delete Note button
+  $(".deleteNote").click(function() {
+      var noteId = $(this).attr("data-note-id");
+      var articleId = $(this).attr("data-article-id");
+      $.ajax({
+          method: "DELETE",
+          url: "/notes/delete/" + noteId + "/" + articleId
+      }).done(function(data) {
+          console.log(data)
+          $(".modalNote").modal("hide");
+          window.location = "/saved"
+      })
+  });
 
 
 

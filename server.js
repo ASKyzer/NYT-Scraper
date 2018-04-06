@@ -163,7 +163,7 @@ app.post("/articles/delete/:id", function(req, res) {
 // Route to create and update article with it's note.
 app.post("/notes/saved/:id", function(req, res) {
   // Create a new not and pass the req.body to the entry
-  db.Note.create(req.body)
+  db.Note.create(req.body.text)
   .then(function(dbNote) {
     // If the note was created successfully, find one Article with that id and update it to be associated with the note.
     return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote.id });

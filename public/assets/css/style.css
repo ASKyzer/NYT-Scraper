@@ -1,0 +1,11 @@
+.home-jumbo {
+  background-image: url("../images/nyt-coffee.jpg");
+  background-size: cover;
+  height: 500px;
+}
+
+.jumbotron h1 {
+  line-height: 400px;
+  font-size: 75px;
+  color: yellow;
+}
