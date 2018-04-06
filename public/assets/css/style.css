@@ -13,3 +13,7 @@
 .jumbotron h1 {
   font-size: 75px;
 }
+
+.navbar-brand {
+  background-color: pink;
+}

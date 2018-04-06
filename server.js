@@ -34,12 +34,13 @@ app.engine("handlebars", exphbs({
 }));
 app.set("view engine", "handlebars");
 
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
 // By default mongoose uses callbacks for async queries, we're setting it to use promises (.then syntax) instead
 // Connect to the Mongo DB
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/scrapingthenews";
-
 mongoose.Promise = Promise;
-mongoose.connect(MONGODB_URI);
+mongoose.connect("mongodb://localhost/scrapingthenews");
+
 // ROUTES //
 
 //GET requests to render Handlebars pages
