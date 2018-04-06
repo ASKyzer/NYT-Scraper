@@ -4,8 +4,12 @@
   height: 500px;
 }
 
+.saved-jumbo {
+  background-image: url("../images/morningCoffee.jpg");
+  background-size: cover;
+  height: 300px;
+}
+
 .jumbotron h1 {
-  line-height: 400px;
   font-size: 75px;
-  color: yellow;
 }

@@ -46,10 +46,12 @@ app.get("/", function(req, res) {
   db.Article.find({ isSaved: false}, function(error, data) {
       var hbsObject = {
         article: data
-      };
+      }
       console.log(hbsObject);
       res.render("home", hbsObject);
-  });
+  }).catch(function(err) {
+    res.json(err)
+  })
 });
 
 app.get("/saved", function(req, res) {
@@ -67,38 +69,41 @@ app.get("/scrape", function(req, res) {
   request("https://www.nytimes.com/", function(error, response, html) {
     // Then we load that into cheerio and save it to $ for a shorthand selector.
     var $ = cheerio.load(html);
+
+    // Save an empty result Object
+    var result = [];
+
     // Now, we grab every article tag and do the following:
     $("article").each(function(i, element) {
 
-      if ( i > 19 ) {
-        return false
-      }
-
-      // Save an empty result Object
-      var result = {};
-
         // Add the title, summary and link and save them as properties of the result object
-        result.title = $(this).children("h2").text();
-        result.summary = $(this).children(".summary").text();
-        result.link = $(this).children("h2").children("a").attr("href");
+        var title = $(element).children("h2").text();
+        var summary = $(element).children(".summary").text();
+        var link = $(element).children("h2").children("a").attr("href");
 
-        // Create a new Article using the result object built from Scraping
-        db.Article.create(result)
-        .then(function(dbArticle) {
-          // View the added result in the console
-          console.log(dbArticle);
-        })
-        .catch(function(err) {
-          // If an error occurred, send it to the client
-          return res.json(err);
-        })
-
-
-
+        if( i <= 19) {
+          result.push ({
+            title: title,
+            summary: summary,
+            link: link
+          })
+          // Create a new Article using the result object built from Scraping
+          db.Article.create(result)
+          .then(function(dbArticle) {
+            // View the added result in the console
+            console.log(dbArticle);
+          })
+          .catch(function(err) {
+            // If an error occurred, send it to the client
+            return res.json(err);
+          })
+        } else {
+            return false;
+          }
     }) // end of article.each function
-
     // If we were able to sucessfully scrape and save the article, send a message to the client
     res.send("Scrape Complete");
+    res.redirect("/")
   }) // end of request to the NYT
 }) // end of get request for /scrape route
 
@@ -117,7 +122,7 @@ app.get("/articles", function(req, res) {
 }) //end of GET request to /articles route
 
 // Route for grabbing a specific article by id and poupulate it with it's Note
-app.get("/article/:id", function(req, res) {
+app.get("/articles/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query to find the matching on in our db.
   db.Article.findOne({ _id: req.params.id })
   // now populate all of the notes associated with it
@@ -146,27 +151,14 @@ app.post("/articles/saved/:id", function(req, res) {
     })
 }) // end of POST request to /articles/save/:id route
 
-//Route to Delete an article
-app.post("/articles/delete/:id", function(req, res) {
-  // Use the article id to find and delete an article
-  db.Article.findOneAndRemove({ _id: req.params.id }, { isSaved: false })
-  .then(function(dbArticle) {
-    // If successful, send it bavk to the client
-    res.json(dbArticle);
-  })
-  .catch(function(err) {
-    // If an error occurred, send it to the client
-    res.json(err);
-  })
-}) // end of DELETE request for removing a article
 
 // Route to create and update article with it's note.
-app.post("/notes/saved/:id", function(req, res) {
+app.post("articles/:id", function(req, res) {
   // Create a new not and pass the req.body to the entry
   db.Note.create(req.body.text)
   .then(function(dbNote) {
     // If the note was created successfully, find one Article with that id and update it to be associated with the note.
-    return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote.id });
+    return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote.id }, { new: true});
   })
   .then(function(dbArticle) {
     // if successful in updating the article, send it bavk to the client
@@ -179,13 +171,9 @@ app.post("/notes/saved/:id", function(req, res) {
 }) // end of POST request to our notes/save/:id route
 
 // Delete a note
-app.delete("/notes/delete/:id", function(req, res) {
+app.delete("delete/:id", function(req, res) {
   // Find note by it's id and delete it.
   db.Note.findOneAndRemove({ _id: req.params.id })
-  .then(function(dbNote) {
-
-    return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote.id });
-  })
   .then(function(dbArticle) {
     // if successful in updating the article, send it bavk to the client
     res.json(dbArticle);

@@ -45,14 +45,14 @@ $(".delete").click(function() {
       url: "/notes/saved/" + savedNoteId,
       method: "POST",
       data: {
-        text: $("#noteText" + savedNoteId).val()
+        text: $("#noteText").val()
       }
     }).done(function(data) {
       console.log(data);
       // Clear the note textarea
-      $("#noteText" + savedNoteId).val("");
-      $(".modalNote").modal("hide");
-      window.location = "/saved"
+      // $("#noteText").val("");
+      // $(".modalNote").modal("hide");
+      location.reload()
     })
   })
 
