@@ -44,11 +44,11 @@ mongoose.connect("mongodb://localhost/scrapingthenews");
 //GET requests to render Handlebars pages
 app.get("/", function(req, res) {
   db.Article.find({ isSaved: false}, function(error, data) {
-    var hbsObject = {
-      article: data
-    };
-    console.log(hbsObject);
-    res.render("home", hbsObject);
+      var hbsObject = {
+        article: data
+      };
+      console.log(hbsObject);
+      res.render("home", hbsObject);
   });
 });
 
@@ -70,24 +70,31 @@ app.get("/scrape", function(req, res) {
     // Now, we grab every article tag and do the following:
     $("article").each(function(i, element) {
 
+      if ( i > 19 ) {
+        return false
+      }
+
       // Save an empty result Object
       var result = {};
 
-      // Add the title, summary and link and save them as properties of the result object
-      result.title = $(this).children("h2").text();
-      result.summary = $(this).children(".summary").text();
-      result.link = $(this).children("h2").children("a").attr("href");
+        // Add the title, summary and link and save them as properties of the result object
+        result.title = $(this).children("h2").text();
+        result.summary = $(this).children(".summary").text();
+        result.link = $(this).children("h2").children("a").attr("href");
 
-      // Create a new Article using the result object built from Scraping
-      db.Article.create(result)
-      .then(function(dbArticle) {
-        // View the added result in the console
-        console.log(dbArticle);
-      })
-      .catch(function(err) {
-        // If an error occurred, send it to the client
-        return res.json(err);
-      })
+        // Create a new Article using the result object built from Scraping
+        db.Article.create(result)
+        .then(function(dbArticle) {
+          // View the added result in the console
+          console.log(dbArticle);
+        })
+        .catch(function(err) {
+          // If an error occurred, send it to the client
+          return res.json(err);
+        })
+
+
+
     }) // end of article.each function
 
     // If we were able to sucessfully scrape and save the article, send a message to the client
@@ -126,7 +133,7 @@ app.get("/article/:id", function(req, res) {
 }) // end of GET request to our /article/:id route.
 
 // Route to save the article
-app.post("/articles/save/:id", function(req, res) {
+app.post("/articles/saved/:id", function(req, res) {
   // Use the article id to find and update the isSaved boolean to true,
   db.Article.findOneAndUpdate({ _id: req.params.id }, { isSaved: true })
     .then(function(dbArticle) {
@@ -139,8 +146,22 @@ app.post("/articles/save/:id", function(req, res) {
     })
 }) // end of POST request to /articles/save/:id route
 
+//Route to Delete an article
+app.post("/articles/delete/:id", function(req, res) {
+  // Use the article id to find and delete an article
+  db.Article.findOneAndRemove({ _id: req.params.id }, { isSaved: false })
+  .then(function(dbArticle) {
+    // If successful, send it bavk to the client
+    res.json(dbArticle);
+  })
+  .catch(function(err) {
+    // If an error occurred, send it to the client
+    res.json(err);
+  })
+}) // end of DELETE request for removing a article
+
 // Route to create and update article with it's note.
-app.post("/notes/save/:id", function(req, res) {
+app.post("/notes/saved/:id", function(req, res) {
   // Create a new not and pass the req.body to the entry
   db.Note.create(req.body)
   .then(function(dbNote) {

@@ -1,36 +1,33 @@
 
 <!--Homepage-->
-<div class="container">
-    <div class="col-md-12 jumbotron">
-      <div class="text-center">
-          <h1> Scrape the News</h1>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-          {{#if Article}}
-              {{#each Article}}
-              <div class="panel panel-default">
-                  <div class="panel-heading">
-                      <a href={{this.link}} target="_blank"><h4>{{this.title}}</h4></a>
-                  </div>
-                  <div class="panel-body">
-                      <p> {{this.summary}}</p>
-                      <br><br>
-                      <button type="button" class="btn btn-success save" data-id={{this._id}}>Save Article</button>
-                  </div>
-              </div>
-              {{/each}}
-          {{else}}
-          <div class="panel panel-default">
-              <div class="panel-body">
-              <h4>Nothing to see here? Press the Scrape button to find some.</h4>
-              </div>
-           </div>
-          {{/if}}
-      </div>
+  <div class="jumbotron jumbotron-fluid">
+    <div class="text-center">
+      <h1> Scrape the News</h1>
     </div>
   </div>
-  <footer>
-    <p>&copy; Copyright Adrian Kyzer</p>
-  </footer>
+  <div class="container">
+    <div class="row" id=#articleRow>
+      <div class="col">
+        {{#if article}}
+          {{#each article}}
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <a href={{this.link}} target="_blank"><h4>{{this.title}}</h4></a>
+              </div>
+              <div class="panel-body">
+                <p> {{this.summary}}</p>
+                <br><br>
+                <button type="button" class="btn btn-success save" data-id={{this._id}}>Save Article</button>
+              </div>
+            </div>
+          {{/each}}
+          {{else}}
+          <div class="panel panel-default">
+            <div class="panel-body">
+            <h4>Nothing to see here? Press the Scrape button to find some.</h4>
+            </div>
+           </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
